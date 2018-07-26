@@ -1,0 +1,28 @@
+---
+- hosts: all
+  remote_user: root
+  tasks:
+
+  - name: "配置nginx官方安装源"
+    copy: src=/etc/yum.repos.d/nginx.repo dest=/etc/yum.repos.d/nginx.repo
+  - name:  "安装Nginx,tree,screen软件包"
+    yum: name={{ item }} state=present 
+    with_items:
+    - nginx
+    - tree
+    - screen  
+
+  - name:  "分发配置文件"
+    copy: 
+      src: /etc/nginx/nginx.conf
+      dest: /etc/nginx/nginx.conf
+      owner: root 
+      group: root 
+      mode: 0644
+      backup: yes
+
+  - name: "写入index.html"
+    shell: echo "I am $(hostname)" > /usr/share/nginx/html/index.html
+
+  - name: "开启nginx服务"
+    service: name=nginx state=started enabled=yes
